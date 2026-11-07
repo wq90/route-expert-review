@@ -54,6 +54,7 @@ window.REVIEW = (function () {
       id: "welcome", section: "A", title: "Weather routing: expert review", items: [
         { type: "para", html: true, text: "Thank you for taking part. We are designing a tool that shows the weather along a ship’s route, suggests routes with an optimiser, lets a person keep the ship out of areas and compares routes. We would like your view, as an expert in the field, on what such a tool must do, on whether its model and data are sound, and on how it draws the weather along a route." },
         { type: "para", text: "It takes about 30 minutes, on a computer. Your answers are saved after every page, so you can stop and come back with the same link on the same computer and browser." },
+        { type: "para", text: "If a colleague could answer too, please send them the address of this page without your personal link: " + window.REVIEW_CONFIG.siteUrl + " (your own link keeps your answers)." },
         { type: "para", text: "First we ask for your own view, before you see anything of the tool. Please answer in your own words; short answers are fine, and you can leave any question empty. If a question is outside your field, choose “Can’t judge”: that is a useful answer too." },
         { type: "consent", id: "consent", required: true },
       ]

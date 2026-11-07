@@ -1,7 +1,7 @@
 // The expert review: draws the pages in questions.js one at a time, keeps the answers in this browser (localStorage), and
 // sends each page's answers to the Google Apps Script when the expert moves on, so a reload or a later visit continues
-// where they were. Each expert has a personal link: ?e=<code>&o=<0-5>, the code naming them in the sheet and o the order of
-// the six weather views on the F2 page. ?test=1 sends nothing, starts afresh at every load and shows the answers on the
+// where they were. Each expert has a personal link: ?e=<code>&o=<0-5>, the code naming them in the sheet (with this browser's own
+// suffix) and o the order of the six weather views on the F2 page. The plain address, without a link, works for anyone. ?test=1 sends nothing, starts afresh at every load and shows the answers on the
 // last page; ?reset=1 forgets what this browser kept for the link and starts again (answers already sent stay in the sheet).
 // Every answer may be left empty, except the consent.
 (function () {
@@ -25,7 +25,9 @@
     var o = parseInt(params.get("o"), 10);
     var given = o >= 0 && o < 6;
     return {
-      pid: code || "nolink-" + Math.random().toString(36).slice(2, 10), noLink: !code,
+      // the link's code with this browser's own suffix, so a link opened by someone else, or on another computer, never
+      // replaces the answers already sent under it
+      pid: code ? code + "-" + Math.random().toString(36).slice(2, 6) : "nolink-" + Math.random().toString(36).slice(2, 10), noLink: !code,
       order: given ? o : Math.floor(Math.random() * 6), orderSource: given ? "link" : "random",
       page: 0, answers: {}, pageMs: {}, pagesDone: [], startedAt: now(), finishedAt: null,
     };
@@ -173,7 +175,7 @@
   function consentHtml() {
     return '<div class="consent"><p><strong>' + esc(C.title) + "</strong>, " + esc(C.institution) + ".</p><ul>" +
       "<li>Your answers are stored in a spreadsheet that only the research team can open.</li>" +
-      "<li>In publications you appear only as an expert number (E1–E4), and quotes are not linked to your name.</li>" +
+      "<li>In publications you appear only as an expert number (such as E7), and quotes are not linked to your name.</li>" +
       "<li>Please don’t include confidential information: vessel names, clients or real operational data.</li>" +
       "<li>Taking part is voluntary. You can skip questions, stop at any time, and ask for your answers to be deleted.</li>" +
       "<li>Questions: " + esc(C.contactEmail) + "</li></ul></div>";

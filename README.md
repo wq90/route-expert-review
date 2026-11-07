@@ -11,7 +11,9 @@ Google Sheet through a Google Apps Script web app.
   route of the online system (by a private script). An image that is missing shows as a marked placeholder.
 - `apps-script/`: the script that stores the answers, and how to set it up.
 
-Each expert opens a personal link, `?e=<code>&o=<0-5>`. Answers are kept in the browser and sent after every page, so an
+Each invited expert opens a personal link, `?e=<code>&o=<0-5>`; the sheet names them by the code with their browser's own
+suffix, so a link opened on another computer adds answers instead of replacing them. Experts may send colleagues the plain
+address, without a link: anyone opening it gets a code of their own and a random view order. Answers are kept in the browser and sent after every page, so an
 expert can stop and come back with the same link on the same computer; a finished link shows the thank-you page. `?test=1`
 sends nothing, starts afresh at every load and shows the answers at the end. `?reset=1` added to a link forgets what this
 browser kept for it and starts again (answers already sent stay in the sheet). Every answer may be left empty, except the

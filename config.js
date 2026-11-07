@@ -10,6 +10,8 @@ window.REVIEW_CONFIG = {
   title: "Weather routing: expert review",
   institution: "King Abdullah University of Science and Technology (KAUST)",
   contactEmail: "multi.vis.w@gmail.com",
+  // the address without a personal link, which an expert may send to colleagues
+  siteUrl: "https://wq90.github.io/route-expert-review/",
 
   // Below this window size the page asks for a larger one: the screenshots need the room
   minWidth: 1000,
