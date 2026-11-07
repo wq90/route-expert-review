@@ -4,7 +4,7 @@ window.REVIEW_CONFIG = {
 
   // The Google Apps Script web app that stores the answers (apps-script/README.md). Empty, or ?test=1 in the address:
   // nothing is sent, and the last page shows the answers instead.
-  scriptUrl: "",
+  scriptUrl: "https://script.google.com/macros/s/AKfycbyC1qu-cS7Yr-N7qaVdHGVYpovzPrmKXZujb-gUnzy8fwjlxRxvID8U3lz5JKoVPmyKxA/exec",
 
   // Shown on the first page
   title: "Weather routing: expert review",
