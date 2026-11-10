@@ -119,7 +119,7 @@
   function shouldShowOther(it) {
     if (it.otherAlways) return true;
     var v = S.answers[it.id];
-    return v === "yes" || (Array.isArray(v) && v.indexOf("other") >= 0);
+    return v === "yes" || v === "other" || (Array.isArray(v) && v.indexOf("other") >= 0);
   }
   function choiceList(it, kind) {
     var v = S.answers[it.id], opts = it.options;
@@ -184,10 +184,10 @@
     var v = S.answers[it.id] || {}, c = S.answers[it.id + "_comment"] || {};
     return '<div class="matrix-wrap"><table class="matrix"><thead><tr><th></th>' + it.options.map(function (o) { return "<th>" + esc(o[1]) + "</th>"; }).join("") +
       "</tr></thead><tbody>" + it.rows.map(function (r) {
-        return '<tr data-row="' + esc(r[0]) + '"><th scope="row"><b>' + esc(r[0]) + "</b> " + esc(r[1]) + "</th>" + it.options.map(function (o) {
-          return '<td><input type="radio" aria-label="' + esc(r[0] + ": " + o[1]) + '" name="' + esc(it.id + "__" + r[0]) + '" value="' + esc(o[0]) + '"' + (v[r[0]] === o[0] ? " checked" : "") + "></td>";
-        }).join("") + '</tr><tr class="comment-row"><td colspan="' + (it.options.length + 1) + '"><input type="text" class="comment" data-comment="' +
-          esc(it.id) + '" data-row="' + esc(r[0]) + '" placeholder="' + esc(it.comment) + '" value="' + esc(c[r[0]] || "") + '"></td></tr>';
+        return '<tr data-row="' + esc(r[0]) + '"><th scope="row">' + (it.plain ? "" : "<b>" + esc(r[0]) + "</b> ") + esc(r[1]) + "</th>" + it.options.map(function (o) {
+          return '<td><input type="radio" aria-label="' + esc((it.plain ? r[1] : r[0]) + ": " + o[1]) + '" name="' + esc(it.id + "__" + r[0]) + '" value="' + esc(o[0]) + '"' + (v[r[0]] === o[0] ? " checked" : "") + "></td>";
+        }).join("") + "</tr>" + (!it.comment ? "" : '<tr class="comment-row"><td colspan="' + (it.options.length + 1) + '"><input type="text" class="comment" data-comment="' +
+          esc(it.id) + '" data-row="' + esc(r[0]) + '" placeholder="' + esc(it.comment) + '" value="' + esc(c[r[0]] || "") + '"></td></tr>');
       }).join("") + "</tbody></table></div>";
   }
   function rankHtml(it) {

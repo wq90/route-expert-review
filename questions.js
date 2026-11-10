@@ -13,6 +13,7 @@ window.REVIEW = (function () {
     ["T4", "Change the route using your own knowledge, for example by keeping the ship out of an area."],
     ["T5", "Compare routes on time, fuel and weather, and choose the best one for this voyage’s priorities."],
     ["T6", "Decide how far to trust the plan, given that forecasts can be wrong."],
+    ["T7", "See how the suggested route changes when you put travel time, fuel or emissions first, and what you give up for each."],
   ];
   var REQS = [
     ["R1", "Show the weather each part of the route will have when the ship is there, not the weather at one moment."],
@@ -61,11 +62,15 @@ window.REVIEW = (function () {
     },
     {
       id: "background", section: "A", title: "About you", items: [
-        { id: "A_field", type: "checks", label: "Your field (choose all that apply)", options: [["maritime", "Maritime"], ["engineering", "Ocean engineering"], ["climate", "Maritime climate"], ["other", "Other"]], other: "A_field_other" },
+        { id: "A_field", type: "checks", label: "Your field and role (choose all that apply)", options: [["operations", "Ship operations and voyage planning (master or officer, voyage planner or route optimiser, fleet or ship operator)"], ["engineering", "Naval architecture and marine engineering (ship design, hydrodynamics, vessel performance)"], ["science", "Ocean and weather science (oceanography, meteorology, ocean-weather forecasting, maritime climate)"], ["research", "Maritime transport research (shipping, logistics, safety, policy)"], ["other", "Other"]], other: "A_field_other" },
         { id: "A_years", type: "number", label: "Years working in this field", min: 0, max: 60 },
+        { id: "A_degree", type: "radio", label: "Your highest qualification", options: [["bachelor", "Bachelor’s or lower"], ["master", "Master’s"], ["doctorate", "Doctorate (PhD or equivalent)"], ["certificate", "Professional maritime certificate (e.g. Master Mariner, Chief Engineer)"], ["other", "Other"]], other: "A_degree_other" },
         { id: "A_sea", type: "radio", label: "Have you worked at sea, or with route planners or ship operators?", options: [["yes", "Yes"], ["no", "No"]], other: "A_sea_how", otherLabel: "If yes, how?" },
         { id: "A_redsea", type: "radio", label: "How well do you know the Red Sea’s weather and sea conditions?", options: [["well", "Well"], ["little", "A little"], ["no", "Not at all"]] },
         { id: "A_tools", type: "checks", label: "Weather-routing tools: have you … (choose all that apply)", options: [["used", "Used one"], ["built", "Built or developed one"], ["studied", "Studied or evaluated one"], ["none", "None of these"]] },
+        { id: "A_vis", type: "radio", label: "How much do you work with data visualisation tools (for example GIS, ECDIS, Windy, or plots in Python or MATLAB)?", options: [["none", "None"], ["little", "A little: I look at them now and then"], ["regular", "Regularly: I use them in my work"], ["lot", "A lot: I design or build visualisations"]] },
+        { id: "A_age", type: "radio", label: "Your age", options: [["18-29", "18–29"], ["30-39", "30–39"], ["40-49", "40–49"], ["50-59", "50–59"], ["60+", "60 or over"], ["no", "Prefer not to say"]] },
+        { id: "A_gender", type: "radio", label: "Your gender", options: [["woman", "Woman"], ["man", "Man"], ["no", "Prefer not to say"]] },
       ]
     },
     {
@@ -79,7 +84,7 @@ window.REVIEW = (function () {
     },
     {
       id: "tasks", section: "C", title: "Tasks", items: [
-        { type: "para", text: "These are six things we think people do when they plan a route with the weather in mind. We wrote them ourselves, so they may be wrong." },
+        { type: "para", text: "These are seven things we think people do when they plan a route with the weather in mind. We wrote them ourselves, so they may be wrong." },
         { id: "C_does", type: "matrix", label: "Is this something people planning a route do?", rows: TASKS, options: DOES, comment: "How would you put it? (optional)" },
         { id: "C_top3", type: "pick", n: 3, label: "Which three matter most?", options: TASKS.map(function (t) { return [t[0], t[0] + " " + t[1]]; }) },
         { id: "C_missing", type: "text", label: "What task is missing?" },
@@ -120,14 +125,16 @@ window.REVIEW = (function () {
         // each view with its own questions under it, in the order the expert's link gives (review.js)
         {
           id: "F2_views", type: "views", views: VIEWS, file: "shots/F2_{view}.jpg", key: "shots/keys/{view}.jpg", per: [
-            { suffix: "read", type: "text", label: "What does this view tell you about the weather on this stretch, and what it does to the ship?" },
-            { suffix: "t1", type: "scale", label: "How well does it show the weather the ship meets, relative to its heading (T1)?", low: "Not at all", high: "Very well" },
-            { suffix: "t2", type: "scale", label: "How well does it show what the weather does to the ship’s speed (T2)?", low: "Not at all", high: "Very well" },
-            { suffix: "unclear", type: "text", label: "What is unclear or misleading in it?" },
+            // reading checks first, then the ratings, then the one open question
+            { suffix: "rel", type: "matrix", check: true, plain: true, label: "On this stretch, where do these come from, relative to the ship?", rows: [["waves", "Waves"], ["wind", "Wind"]], options: [["ahead", "From ahead"], ["side", "From the side"], ["behind", "From behind"], ["cant", "Can’t tell from this view"]] },
+            { suffix: "speed", type: "radio", check: true, label: "What does the weather do to the ship’s speed on this stretch?", options: [["slows", "Slows it"], ["little", "Little effect"], ["speeds", "Speeds it up"], ["cant", "Can’t tell from this view"]] },
+            { suffix: "t1", type: "scale", label: "How well does it show the weather the ship meets, relative to its heading?", low: "Not at all", high: "Very well" },
+            { suffix: "t2", type: "scale", label: "How well does it show what the weather does to the ship’s speed?", low: "Not at all", high: "Very well" },
+            { suffix: "note", type: "text", label: "What does this view tell you about the weather and the ship, and what is unclear or misleading in it?" },
           ]
         },
-        { id: "F2_t1", inViewOrder: true, type: "radio", label: "Of the six, which would you use to see the weather the ship meets (T1)?", options: VIEWS.concat([["none", "None of them"]]) },
-        { id: "F2_t2", inViewOrder: true, type: "radio", label: "Which would you use to judge the weather’s effect on the ship’s speed (T2)?", options: VIEWS.concat([["none", "None of them"]]) },
+        { id: "F2_t1", inViewOrder: true, type: "radio", label: "Of the six, which would you use to see the weather the ship meets?", options: VIEWS.concat([["none", "None of them"]]) },
+        { id: "F2_t2", inViewOrder: true, type: "radio", label: "Which would you use to judge the weather’s effect on the ship’s speed?", options: VIEWS.concat([["none", "None of them"]]) },
         { id: "F2_wrong", type: "text", label: "Anything else about the six views?" },
       ]
     },
