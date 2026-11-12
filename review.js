@@ -2,7 +2,8 @@
 // sends each page's answers to the Google Apps Script when the expert moves on, so a reload or a later visit continues
 // where they were. Each expert has a personal link: ?e=<code>&o=<0-5>, the code naming them in the sheet (with this browser's own
 // suffix) and o the order of the six weather views on the F2 page. The plain address, without a link, works for anyone. ?test=1 sends nothing, starts afresh at every load and shows the answers on the
-// last page; ?reset=1 forgets what this browser kept for the link and starts again (answers already sent stay in the sheet).
+// last page; ?reset=1 starts a new attempt, but only once this browser has finished the link (an attempt in progress always
+// continues), and is then taken out of the address so a reload continues too (answers already sent stay in the sheet).
 // Every answer may be left empty, except the consent.
 (function () {
   "use strict";
@@ -20,7 +21,13 @@
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
 
   // --- state -----------------------------------------------------------------------------------------------------------
-  var S = (TEST || params.has("reset") ? null : load()) || fresh();
+  var kept = TEST ? null : load();
+  if (kept && kept.finishedAt && params.has("reset")) kept = null;
+  var S = kept || fresh();
+  if (params.has("reset")) {
+    params.delete("reset");
+    try { history.replaceState(null, "", location.pathname + (params.toString() ? "?" + params : "") + location.hash); } catch (e) { /* the address keeps it */ }
+  }
   function fresh() {
     var o = parseInt(params.get("o"), 10);
     var given = o >= 0 && o < 6;
